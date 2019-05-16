@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import moment from 'moment'
 
 import './app.css'
@@ -47,16 +48,16 @@ class App extends Component {
     this.setState({currTaskName: e.currentTarget.value})
   }
 
-  render() {
+  renderFirstPage = () => {
     const {start, currTaskName, tasks, currTimeStart, currTime} = this.state
 
-    return <div className="app">
+    return <div>
       <div className="timer">{!start ? '00:00' : moment( currTime - currTimeStart).format('mm:ss')}</div>
       <div className="button">
         {(!start) ?
-          <button onClick={this.startTimer}>Старт</button>
+          <button onClick={this.startTimer}>Start</button>
           :
-          <button onClick={this.stopTimer}>Стоп</button>}
+          <button onClick={this.stopTimer}>Stop</button>}
       </div>
       <div className="input">
         <input
@@ -77,7 +78,7 @@ class App extends Component {
             <td>End</td>
           </tr>
           {tasks.map((task, i) => <tr key={i}>
-            <td>{task.taskName}</td>
+            <td><Link to={`/${i}`}>{task.taskName}</Link></td>
             <td>{moment(task.timeStart).format('HH:mm:ss')}</td>
             <td>{moment(task.timeEnd - task.timeStart).format('mm:ss')}</td>
             <td>{moment(task.timeEnd).format('HH:mm:ss')}</td>
@@ -85,6 +86,30 @@ class App extends Component {
           </tbody>
         </table>
       </div>
+    </div>
+  }
+
+  renderTaskPage = ({match}) => {
+    const taskId = match.params.id
+    const task = this.state.tasks[taskId]
+
+    if (!task) return <div>Not found</div>
+    return <div>
+      <h1>Task #{taskId}</h1>
+      <p>Task name: </p>
+      <p>Start: {moment(task.timeStart).format('HH:mm:ss')}</p>
+      <p>Duration: {moment(task.timeEnd - task.timeStart).format('mm:ss')}</p>
+      <p>End: {moment(task.timeEnd).format('HH:mm:ss')}</p>
+    </div>
+  }
+
+  render() {
+    return <div className="app">
+      <Router>
+        <Link to="/">Main Page</Link><hr/>
+      <Route path="/" exact component={this.renderFirstPage} />
+      <Route path="/:id" component={this.renderTaskPage} />
+    </Router>
     </div>
   }
 }
