@@ -8,6 +8,7 @@ import TimerButton from './TimerButton'
 import TimerInput from './TimerInput'
 import TimerTable from './TimerTable'
 import TaskPageData from './TaskPageData'
+import TimerTablePages from './TimerTablePages'
 
 import config from '../config'
 
@@ -21,7 +22,9 @@ class App extends Component {
     currTaskName: '',
     currTimeStart: 0,
     tasks: [],
-    start: 0
+    start: 0,
+    countPages: 1,
+    currentPage: 1
   }
 
   async componentDidMount() {
@@ -92,14 +95,29 @@ class App extends Component {
     this.setState({currTaskName: e.currentTarget.value})
   }
 
+  loadNextPage = async () => {
+    if (!dev) {
+      const res = await fetch(`${config.serverPath}?action=get_page&page=${this.state.currentPage++}`, {
+        method: 'GET'
+      })
+
+      const {tasks, currentPage} = await res.json()
+      const newData = {tasks: [...this.state.tasks, ...tasks], currentPage: currentPage}
+
+      this.setState(newData)
+    }
+  }
+
   renderFirstPage = () => {
-    const {start, currTaskName, tasks, currTimeStart, currTime} = this.state
+    const {start, currTaskName, tasks,
+      currTimeStart, currTime, currentPage, countPages} = this.state
 
     return <div>
       <Timer currTime={currTime} currTimeStart={currTimeStart} start={start}/>
       <TimerButton start={start} onStart={this.startTimer} onStop={this.stopTimer}/>
       <TimerInput start={start} onChangeName={this.updateTaskName} currTaskName={currTaskName}/>
       <TimerTable tasks={tasks} basePath={config.basePath}/>
+      <TimerTablePages onNextPage={this.loadNextPage}/>
     </div>
   }
 
