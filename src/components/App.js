@@ -17,8 +17,12 @@ class App extends Component {
     start: 0
   }
 
-  componentDidMount() {
-    this.loadData()
+  async componentDidMount() {
+    await this.loadData()
+
+    if (this.state.start) {
+      this.timer = setInterval(this.updateTimer, 1000)
+    }
   }
 
   loadData = async () => {
@@ -26,21 +30,30 @@ class App extends Component {
       method: 'GET'
     })
 
-    console.log(res)
+    const data = await res.json();
+    console.log('data', data)
+
+    this.setState(data)
   }
 
   startTimer = async () => {
     if (this.state.currTaskName !== '') {
       const startDate = moment()
-      this.setState({start: 1, currTimeStart: startDate, currTime: startDate})
+
+      const newData = {...this.state, start: 1, currTimeStart: startDate, currTime: startDate}
+
+      this.setState(newData)
+
       this.timer = setInterval(this.updateTimer, 1000)
+
+      console.log('save state', newData)
 
       const res = await fetch('http://jiks.ru/timer/server.php?action=save', {
         method: 'POST',
-        body: JSON.stringify(this.state)
+        body: JSON.stringify(newData)
       })
 
-      console.log(res)
+      console.log('start save', res)
     }
   }
 
@@ -48,11 +61,11 @@ class App extends Component {
     this.setState({currTime: moment()})
   }
 
-  stopTimer = () => {
+  stopTimer = async () => {
     const {currTaskName, currTimeStart, tasks, currTime} = this.state
 
-    clearInterval(this.timer)
-    this.setState({
+    const newData = {
+      ...this.state,
       start: 0,
       currTime: null,
       currTaskName: '',
@@ -61,7 +74,19 @@ class App extends Component {
         timeStart: currTimeStart,
         timeEnd: currTime
       }]
+    }
+
+    clearInterval(this.timer)
+    this.setState(newData)
+
+    console.log('stop state', newData)
+
+    const res = await fetch('http://jiks.ru/timer/server.php?action=save', {
+      method: 'POST',
+      body: JSON.stringify(newData)
     })
+
+    console.log('stop save', res)
 
   }
 
@@ -73,7 +98,7 @@ class App extends Component {
     const {start, currTaskName, tasks, currTimeStart, currTime} = this.state
 
     return <div>
-      <div className="timer">{!start ? '00:00' : moment(currTime - currTimeStart).format('mm:ss')}</div>
+      <div className="timer">{!start ? '00:00' : moment(moment(currTime) - moment(currTimeStart)).format('mm:ss')}</div>
       <div className="button">
         {(!start) ?
           <button onClick={this.startTimer}>Start</button>
@@ -101,7 +126,7 @@ class App extends Component {
           {tasks.map((task, i) => <tr key={i}>
             <td><Link to={`${basePath}/${i}`}>{task.taskName}</Link></td>
             <td>{moment(task.timeStart).format('HH:mm:ss')}</td>
-            <td>{moment(task.timeEnd - task.timeStart).format('mm:ss')}</td>
+            <td>{moment(moment(task.timeEnd) - moment(task.timeStart)).format('mm:ss')}</td>
             <td>{moment(task.timeEnd).format('HH:mm:ss')}</td>
           </tr>)}
           </tbody>
