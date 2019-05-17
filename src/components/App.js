@@ -11,6 +11,7 @@ import TaskPageData from './TaskPageData'
 
 const basePath = (process.env.NODE_ENV !== 'production') ? '' : '/timer/build'
 const dev = process.env.NODE_ENV !== 'production'
+const serverPath = 'http://jiks.ru/timer/server.php'
 
 class App extends Component {
   timer = null
@@ -33,7 +34,7 @@ class App extends Component {
 
   loadData = async () => {
     if (!dev) {
-      const res = await fetch('http://jiks.ru/timer/server.php?action=get', {
+      const res = await fetch(`${serverPath}?action=get`, {
         method: 'GET'
       })
 
@@ -80,7 +81,7 @@ class App extends Component {
     this.setState(data)
 
     if (!dev) {
-      await fetch('http://jiks.ru/timer/server.php?action=save', {
+      await fetch(`${serverPath}?action=save`, {
         method: 'POST',
         body: JSON.stringify(data)
       })
