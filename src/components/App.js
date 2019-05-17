@@ -9,9 +9,9 @@ import TimerInput from './TimerInput'
 import TimerTable from './TimerTable'
 import TaskPageData from './TaskPageData'
 
-const basePath = (process.env.NODE_ENV !== 'production') ? '' : '/timer/build'
+import config from '../config'
+
 const dev = process.env.NODE_ENV !== 'production'
-const serverPath = 'http://jiks.ru/timer/server.php'
 
 class App extends Component {
   timer = null
@@ -34,7 +34,7 @@ class App extends Component {
 
   loadData = async () => {
     if (!dev) {
-      const res = await fetch(`${serverPath}?action=get`, {
+      const res = await fetch(`${config.serverPath}?action=get`, {
         method: 'GET'
       })
 
@@ -81,7 +81,7 @@ class App extends Component {
     this.setState(data)
 
     if (!dev) {
-      await fetch(`${serverPath}?action=save`, {
+      await fetch(`${config.serverPath}?action=save`, {
         method: 'POST',
         body: JSON.stringify(data)
       })
@@ -99,7 +99,7 @@ class App extends Component {
       <Timer currTime={currTime} currTimeStart={currTimeStart} start={start}/>
       <TimerButton start={start} onStart={this.startTimer} onStop={this.stopTimer}/>
       <TimerInput start={start} onChangeName={this.updateTaskName} currTaskName={currTaskName}/>
-      <TimerTable tasks={tasks} basePath={basePath}/>
+      <TimerTable tasks={tasks} basePath={config.basePath}/>
     </div>
   }
 
@@ -114,10 +114,10 @@ class App extends Component {
   render() {
     return <div className="app">
       <Router>
-        <Link to={`${basePath}/`}>Main Page</Link>
+        <Link to={`${config.basePath}/`}>Main Page</Link>
         <hr/>
-        <Route path={`${basePath}/`} exact component={this.renderFirstPage}/>
-        <Route path={`${basePath}/:id`} component={this.renderTaskPage}/>
+        <Route path={`${config.basePath}/`} exact component={this.renderFirstPage}/>
+        <Route path={`${config.basePath}/:id`} component={this.renderTaskPage}/>
       </Router>
     </div>
   }
