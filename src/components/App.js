@@ -3,8 +3,14 @@ import {BrowserRouter as Router, Route, Link} from 'react-router-dom'
 import moment from 'moment'
 
 import './app.css'
+import Timer from './Timer'
+import TimerButton from './TimerButton'
+import TimerInput from './TimerInput'
+import TimerTable from './TimerTable'
+import TaskPageData from './TaskPageData'
 
 const basePath = (process.env.NODE_ENV !== 'production') ? '' : '/timer/build'
+const dev = process.env.NODE_ENV !== 'production'
 
 class App extends Component {
   timer = null
@@ -26,34 +32,24 @@ class App extends Component {
   }
 
   loadData = async () => {
-    const res = await fetch('http://jiks.ru/timer/server.php?action=get', {
-      method: 'GET'
-    })
+    if (!dev) {
+      const res = await fetch('http://jiks.ru/timer/server.php?action=get', {
+        method: 'GET'
+      })
 
-    const data = await res.json();
-    console.log('data', data)
-
-    this.setState(data)
+      const data = await res.json()
+      this.setState(data)
+    }
   }
 
   startTimer = async () => {
     if (this.state.currTaskName !== '') {
       const startDate = moment()
-
       const newData = {...this.state, start: 1, currTimeStart: startDate, currTime: startDate}
-
-      this.setState(newData)
 
       this.timer = setInterval(this.updateTimer, 1000)
 
-      console.log('save state', newData)
-
-      const res = await fetch('http://jiks.ru/timer/server.php?action=save', {
-        method: 'POST',
-        body: JSON.stringify(newData)
-      })
-
-      console.log('start save', res)
+      await this.saveState(newData)
     }
   }
 
@@ -77,17 +73,18 @@ class App extends Component {
     }
 
     clearInterval(this.timer)
-    this.setState(newData)
+    await this.saveState(newData)
+  }
 
-    console.log('stop state', newData)
+  saveState = async (data) => {
+    this.setState(data)
 
-    const res = await fetch('http://jiks.ru/timer/server.php?action=save', {
-      method: 'POST',
-      body: JSON.stringify(newData)
-    })
-
-    console.log('stop save', res)
-
+    if (!dev) {
+      await fetch('http://jiks.ru/timer/server.php?action=save', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      })
+    }
   }
 
   updateTaskName = (e) => {
@@ -98,40 +95,10 @@ class App extends Component {
     const {start, currTaskName, tasks, currTimeStart, currTime} = this.state
 
     return <div>
-      <div className="timer">{!start ? '00:00' : moment(moment(currTime) - moment(currTimeStart)).format('mm:ss')}</div>
-      <div className="button">
-        {(!start) ?
-          <button onClick={this.startTimer}>Start</button>
-          :
-          <button onClick={this.stopTimer}>Stop</button>}
-      </div>
-      <div className="input">
-        <input
-          disabled={start}
-          onChange={this.updateTaskName}
-          value={currTaskName}
-          placeholder="Enter name"
-          type="text"
-        />
-      </div>
-      <div className="table">
-        <table>
-          <tbody>
-          <tr>
-            <td>Task name</td>
-            <td>Start</td>
-            <td>Duration</td>
-            <td>End</td>
-          </tr>
-          {tasks.map((task, i) => <tr key={i}>
-            <td><Link to={`${basePath}/${i}`}>{task.taskName}</Link></td>
-            <td>{moment(task.timeStart).format('HH:mm:ss')}</td>
-            <td>{moment(moment(task.timeEnd) - moment(task.timeStart)).format('mm:ss')}</td>
-            <td>{moment(task.timeEnd).format('HH:mm:ss')}</td>
-          </tr>)}
-          </tbody>
-        </table>
-      </div>
+      <Timer currTime={currTime} currTimeStart={currTimeStart} start={start}/>
+      <TimerButton start={start} onStart={this.startTimer} onStop={this.stopTimer}/>
+      <TimerInput start={start} onChangeName={this.updateTaskName} currTaskName={currTaskName}/>
+      <TimerTable tasks={tasks} basePath={basePath}/>
     </div>
   }
 
@@ -140,13 +107,7 @@ class App extends Component {
     const task = this.state.tasks[taskId]
 
     if (!task) return <div>Not found</div>
-    return <div>
-      <h1>Task #{taskId}</h1>
-      <p>Task name: </p>
-      <p>Start: {moment(task.timeStart).format('HH:mm:ss')}</p>
-      <p>Duration: {moment(moment(task.timeEnd) - moment(task.timeStart)).format('mm:ss')}</p>
-      <p>End: {moment(task.timeEnd).format('HH:mm:ss')}</p>
-    </div>
+    return <TaskPageData task={task} taskId={taskId}/>
   }
 
   render() {
