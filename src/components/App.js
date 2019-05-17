@@ -17,6 +17,18 @@ class App extends Component {
     start: 0
   }
 
+  componentDidMount() {
+    this.loadData()
+  }
+
+  loadData = async () => {
+    const res = await fetch('http://jiks.ru/timer/server.php?action=get', {
+      method: 'GET'
+    })
+
+    console.log(res)
+  }
+
   startTimer = async () => {
     if (this.state.currTaskName !== '') {
       const startDate = moment()
