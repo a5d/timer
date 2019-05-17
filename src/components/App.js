@@ -15,11 +15,18 @@ class App extends Component {
     start: 0
   }
 
-  startTimer = () => {
+  startTimer = async () => {
     if (this.state.currTaskName !== '') {
       const startDate = moment()
       this.setState({start: 1, currTimeStart: startDate, currTime: startDate})
       this.timer = setInterval(this.updateTimer, 1000)
+
+      const res = await fetch("http://jiks.ru/timer/server.php?action=save", {
+        method: "POST",
+        body: JSON.stringify(this.state)
+      })
+
+      console.log(res)
     }
   }
 
@@ -78,7 +85,7 @@ class App extends Component {
             <td>End</td>
           </tr>
           {tasks.map((task, i) => <tr key={i}>
-            <td><Link to={`/${i}`}>{task.taskName}</Link></td>
+            <td><Link to={`/timer/build/${i}`}>{task.taskName}</Link></td>
             <td>{moment(task.timeStart).format('HH:mm:ss')}</td>
             <td>{moment(task.timeEnd - task.timeStart).format('mm:ss')}</td>
             <td>{moment(task.timeEnd).format('HH:mm:ss')}</td>
@@ -106,9 +113,9 @@ class App extends Component {
   render() {
     return <div className="app">
       <Router>
-        <Link to="/">Main Page</Link><hr/>
-      <Route path="/" exact component={this.renderFirstPage} />
-      <Route path="/:id" component={this.renderTaskPage} />
+        <Link to="/timer/build/">Main Page</Link><hr/>
+      <Route path="/timer/build/" exact component={this.renderFirstPage} />
+      <Route path="/timer/build/:id" component={this.renderTaskPage} />
     </Router>
     </div>
   }
