@@ -6,7 +6,7 @@ if ($_GET['action'] === 'save') {
 }
 
 if ($_GET['action'] === 'get') {
-    $inputJSON = file_get_contents('data.txt', $inputJSON);
+    $inputJSON = file_get_contents('data.txt');
     header('Content-Type: application/json');
     print $inputJSON;
 }
