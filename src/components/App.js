@@ -109,15 +109,17 @@ class App extends Component {
   }
 
   renderFirstPage = () => {
-    const {start, currTaskName, tasks,
-      currTimeStart, currTime, currentPage, countPages} = this.state
+    const {
+      start, currTaskName, tasks,
+      currTimeStart, currTime, countPages
+    } = this.state
 
     return <div>
       <Timer currTime={currTime} currTimeStart={currTimeStart} start={start}/>
       <TimerButton start={start} onStart={this.startTimer} onStop={this.stopTimer}/>
       <TimerInput start={start} onChangeName={this.updateTaskName} currTaskName={currTaskName}/>
       <TimerTable tasks={tasks} basePath={config.basePath}/>
-      <TimerTablePages onNextPage={this.loadNextPage}/>
+      {countPages > 1 && <TimerTablePages onNextPage={this.loadNextPage}/>}
     </div>
   }
 
