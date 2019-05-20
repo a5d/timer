@@ -7,6 +7,10 @@ import config from '../config'
 import TaskPage from './pages/TaskPage'
 import FirstPage from './pages/FirstPage'
 
+const Secret = () => {
+  return <div>123</div>
+}
+
 class App extends Component {
   render() {
     return <div className="app">
@@ -15,6 +19,7 @@ class App extends Component {
         <hr/>
         <Route path={`${config.basePath}/`} exact component={FirstPage}/>
         <Route path={`${config.basePath}/:id`} component={TaskPage}/>
+        <Route path={`${config.basePath}/secret`} component={Secret}/>
       </Router>
     </div>
   }

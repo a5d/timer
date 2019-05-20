@@ -1,13 +1,15 @@
 import React, {Component} from 'react'
 import moment from 'moment'
 import {connect} from 'react-redux'
+import {Link} from 'react-router-dom'
+import {Table} from 'antd'
 
 import config from '../../config'
+import 'antd/lib/table/style/index.css';
 
 import Timer from '../Timer'
 import TimerButton from '../TimerButton'
 import TimerInput from '../TimerInput'
-import TimerTable from '../TimerTable'
 import TimerTablePages from '../TimerTablePages'
 
 import {fetchTasks, updateTaskName, updateTaskCurrTime, updateTasks} from '../../actions'
@@ -74,11 +76,41 @@ class FirstPage extends Component {
       currTimeStart, currTime, countPages
     } = this.props.state
 
+    const columns = [
+      {
+        title: 'TaskName',
+        dataIndex: 'taskName',
+        key: 'name',
+        render: (text, record, key) => {
+          return <Link to={`${config.basePath}/${key}`}>{text}</Link>
+        },
+      },
+      {
+        title: 'Start',
+        dataIndex: 'timeStart',
+        key: 'start',
+        render: (text) => moment(text).format('HH:mm:ss'),
+      },
+      {
+        title: 'Duration',
+        key: 'dur',
+        render: (text, record) => {
+          return moment(moment(record.timeEnd) - moment(record.timeStart)).format('mm:ss')
+        },
+      },
+      {
+        title: 'End',
+        dataIndex: 'timeEnd',
+        key: 'end',
+        render: (text) => moment(text).format('HH:mm:ss'),
+      }
+    ]
+
     return <div>
       <Timer currTime={currTime} currTimeStart={currTimeStart} start={start}/>
       <TimerButton start={start} onStart={this.startTimer} onStop={this.stopTimer}/>
       <TimerInput start={start} onChangeName={this.updateTaskName} currTaskName={currTaskName}/>
-      <TimerTable tasks={tasks} basePath={config.basePath}/>
+      <Table bordered columns={columns} dataSource={tasks} pagination={false}/>
       {countPages > 1 && <TimerTablePages onNextPage={this.loadNextPage}/>}
     </div>
   }
