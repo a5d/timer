@@ -1,6 +1,7 @@
 import {combineReducers} from 'redux'
 
 const defState = {
+  loaded: 0,
   currTime: null,
   currTaskName: '',
   currTimeStart: 0,
@@ -12,7 +13,7 @@ const defState = {
 
 const tasksReducer = (state = defState, action) => {
   if (action.type === 'FETCH_TASKS') {
-    return {...state, ...action.payload}
+    return {...state, ...action.payload, loaded: 1}
   } else if (action.type === 'UPDATE_TASK_NAME') {
     return {...state, currTaskName: action.payload}
   }  else if (action.type === 'UPDATE_TASK_CURR_TIME') {

@@ -16,7 +16,7 @@ class FirstPage extends Component {
   timer = null
 
   componentDidMount() {
-    this.props.fetchTasks()
+    if (!this.props.state.loaded) this.props.fetchTasks()
 
     if (this.props.state.start) {
       this.timer = setInterval(this.updateTimer, 1000)
