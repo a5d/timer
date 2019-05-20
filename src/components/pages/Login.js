@@ -61,7 +61,7 @@ class Login extends Component {
       {(!this.state.logged) ? <form onSubmit={this.sendForm}>
         <p><input name="name" onChange={this.updateInput} value={this.state.name} placeholder="login" type="text"/></p>
         <p><input name="password" onChange={this.updateInput} value={this.state.password} placeholder="password"
-                  type="text"/></p>
+                  type="password"/></p>
         <p><input value="Send" type="submit"/></p>
       </form> : <div>
         <p>Logged</p>
