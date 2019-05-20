@@ -69,3 +69,8 @@ if ($_GET['action'] === 'login') {
 
     print 0;
 }
+
+if ($_GET['action'] === 'logout') {
+    setcookie('auth', null, -1, '/');
+    print 0;
+}
