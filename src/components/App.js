@@ -7,10 +7,10 @@ import Timer from './Timer'
 import TimerButton from './TimerButton'
 import TimerInput from './TimerInput'
 import TimerTable from './TimerTable'
-import TaskPageData from './TaskPageData'
 import TimerTablePages from './TimerTablePages'
 
 import config from '../config'
+import TaskPage from './pages/TaskPage'
 
 const dev = process.env.NODE_ENV !== 'production'
 
@@ -123,21 +123,13 @@ class App extends Component {
     </div>
   }
 
-  renderTaskPage = ({match}) => {
-    const taskId = match.params.id
-    const task = this.state.tasks[taskId]
-
-    if (!task) return <div>Not found</div>
-    return <TaskPageData task={task} taskId={taskId}/>
-  }
-
   render() {
     return <div className="app">
       <Router>
         <Link to={`${config.basePath}/`}>Main Page</Link>
         <hr/>
         <Route path={`${config.basePath}/`} exact component={this.renderFirstPage}/>
-        <Route path={`${config.basePath}/:id`} component={this.renderTaskPage}/>
+        <Route path={`${config.basePath}/:id`} component={TaskPage}/>
       </Router>
     </div>
   }
