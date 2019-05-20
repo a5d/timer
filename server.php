@@ -36,3 +36,12 @@ if ($_GET['action'] === 'get_page') {
 
     print $outputJSON;
 }
+if ($_GET['action'] === 'getTask') {
+    $inputJSON = file_get_contents('data.txt');
+    header('Content-Type: application/json');
+
+    $json = json_decode($inputJSON, true);
+
+    $outputJSON = json_encode($json['tasks'][$_GET['taskId']]);
+    print $outputJSON;
+}

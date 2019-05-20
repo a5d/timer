@@ -6,7 +6,7 @@ const dev = process.env.NODE_ENV !== 'production'
 
 class TaskPage extends Component{
   state = {
-    task: {}
+    task: null
   }
 
   async componentDidMount() {
@@ -20,7 +20,7 @@ class TaskPage extends Component{
       })
 
       const data = await res.json()
-      this.setState(data)
+      this.setState({task: data})
     }
   }
 
@@ -28,7 +28,7 @@ class TaskPage extends Component{
     const {task} = this.state
 
     if (!task) return <div>Not found</div>
-    return <TaskPageData task={task}/>
+    return <TaskPageData taskId={this.props.match.params.id} task={task}/>
   }
 }
 
