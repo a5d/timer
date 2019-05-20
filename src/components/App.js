@@ -6,20 +6,21 @@ import './app.css'
 import config from '../config'
 import TaskPage from './pages/TaskPage'
 import FirstPage from './pages/FirstPage'
-
-const Secret = () => {
-  return <div>123</div>
-}
+import Login from './pages/Login'
 
 class App extends Component {
   render() {
     return <div className="app">
       <Router>
-        <Link to={`${config.basePath}/`}>Main Page</Link>
-        <hr/>
-        <Route path={`${config.basePath}/`} exact component={FirstPage}/>
-        <Route path={`${config.basePath}/:id`} component={TaskPage}/>
-        <Route path={`${config.basePath}/secret`} component={Secret}/>
+          <p>
+            <Link to={`${config.basePath}/`}>Main Page</Link>
+            {' | '}
+            <Link to={`${config.basePath}/login`}>Login</Link>
+          </p>
+          <hr/>
+          <Route path={`${config.basePath}/`} exact component={FirstPage}/>
+          <Route path={`${config.basePath}/task/:id`} component={TaskPage}/>
+          <Route path={`${config.basePath}/login`} component={Login}/>
       </Router>
     </div>
   }

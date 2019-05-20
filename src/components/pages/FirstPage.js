@@ -82,7 +82,7 @@ class FirstPage extends Component {
         dataIndex: 'taskName',
         key: 'name',
         render: (text, record, key) => {
-          return <Link to={`${config.basePath}/${key}`}>{text}</Link>
+          return <Link to={`${config.basePath}/task/${key}`}>{text}</Link>
         },
       },
       {
