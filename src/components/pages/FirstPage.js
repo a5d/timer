@@ -1,67 +1,47 @@
 import React, {Component} from 'react'
 import moment from 'moment'
+import {connect} from 'react-redux'
 
 import config from '../../config'
+
 import Timer from '../Timer'
 import TimerButton from '../TimerButton'
 import TimerInput from '../TimerInput'
 import TimerTable from '../TimerTable'
 import TimerTablePages from '../TimerTablePages'
 
-const dev = process.env.NODE_ENV !== 'production'
+import {fetchTasks, updateTaskName, updateTaskCurrTime, updateTasks} from '../../actions'
 
 class FirstPage extends Component {
   timer = null
 
-  state = {
-    currTime: null,
-    currTaskName: '',
-    currTimeStart: 0,
-    tasks: [],
-    start: 0,
-    countPages: 1,
-    currentPage: 1
-  }
+  componentDidMount() {
+    this.props.fetchTasks()
 
-  async componentDidMount() {
-    await this.loadData()
-
-    if (this.state.start) {
+    if (this.props.state.start) {
       this.timer = setInterval(this.updateTimer, 1000)
-    }
-  }
-
-  loadData = async () => {
-    if (!dev) {
-      const res = await fetch(`${config.serverPath}?action=get`, {
-        method: 'GET'
-      })
-
-      const data = await res.json()
-      this.setState(data)
     }
   }
 
   startTimer = async () => {
-    if (this.state.currTaskName !== '') {
+    if (this.props.state.currTaskName !== '') {
       const startDate = moment()
-      const newData = {...this.state, start: 1, currTimeStart: startDate, currTime: startDate}
 
       this.timer = setInterval(this.updateTimer, 1000)
-
-      await this.saveState(newData)
+      this.props.updateTasks({start: 1, currTimeStart: startDate, currTime: startDate})
     }
   }
 
   updateTimer = () => {
-    this.setState({currTime: moment()})
+    this.props.updateTaskCurrTime(moment())
   }
 
   stopTimer = async () => {
-    const {currTaskName, currTimeStart, tasks, currTime} = this.state
+    const {currTaskName, currTimeStart, tasks, currTime} = this.props.state
 
-    const newData = {
-      ...this.state,
+    clearInterval(this.timer)
+
+    this.props.updateTasks({
       start: 0,
       currTime: null,
       currTaskName: '',
@@ -70,37 +50,21 @@ class FirstPage extends Component {
         timeStart: currTimeStart,
         timeEnd: currTime
       }]
-    }
-
-    clearInterval(this.timer)
-    await this.saveState(newData)
-  }
-
-  saveState = async (data) => {
-    this.setState(data)
-
-    if (!dev) {
-      await fetch(`${config.serverPath}?action=save`, {
-        method: 'POST',
-        body: JSON.stringify(data)
-      })
-    }
+    })
   }
 
   updateTaskName = (e) => {
-    this.setState({currTaskName: e.currentTarget.value})
+    this.props.updateTaskName(e.currentTarget.value)
   }
 
   loadNextPage = async () => {
-    if (!dev) {
-      const res = await fetch(`${config.serverPath}?action=get_page&page=${this.state.currentPage++}`, {
+    if (!config.dev) {
+      const res = await fetch(`${config.serverPath}?action=get_page&page=${this.props.state.currentPage++}`, {
         method: 'GET'
       })
 
       const {tasks, currentPage} = await res.json()
-      const newData = {tasks: [...this.state.tasks, ...tasks], currentPage: currentPage}
-
-      this.setState(newData)
+      this.props.updateTasks({tasks: [...this.props.state.tasks, ...tasks], currentPage: currentPage})
     }
   }
 
@@ -108,7 +72,7 @@ class FirstPage extends Component {
     const {
       start, currTaskName, tasks,
       currTimeStart, currTime, countPages
-    } = this.state
+    } = this.props.state
 
     return <div>
       <Timer currTime={currTime} currTimeStart={currTimeStart} start={start}/>
@@ -120,4 +84,10 @@ class FirstPage extends Component {
   }
 }
 
-export default FirstPage
+const mapStateToProps = (state) => {
+  return {
+    state: state.tasks,
+  }
+}
+
+export default connect(mapStateToProps, {fetchTasks, updateTaskName, updateTaskCurrTime, updateTasks})(FirstPage)
