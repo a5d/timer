@@ -14,7 +14,7 @@ class TaskPage extends Component{
     const task = tasks[this.props.match.params.id]
 
     if (!task) return <div>Not found</div>
-    return <TaskPageData taskId={this.props.match.params.id} task={task}/>
+    return <TaskPageData task={{...task, id: this.props.match.params.id}}/>
   }
 }
 
