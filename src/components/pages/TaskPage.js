@@ -6,7 +6,7 @@ import {fetchTasks} from '../../actions'
 
 class TaskPage extends Component{
   componentDidMount() {
-    if (!this.props.state.loaded) this.props.fetchTasks()
+    this.props.fetchTasks()
   }
 
   render() {

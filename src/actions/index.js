@@ -1,7 +1,7 @@
 import config from '../config'
 
-export const fetchTasks = () => async dispatch => {
-  if (!config.dev) {
+export const fetchTasks = () => async (dispatch, getState) => {
+  if (!config.dev && !getState().tasks.loaded) {
     const response = await fetch(`${config.serverPath}?action=get`, {
       method: 'GET'
     })
