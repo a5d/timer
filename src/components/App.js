@@ -1,17 +1,18 @@
-import React, {Component} from 'react'
+import React, {Component, Suspense, lazy} from 'react'
 import {BrowserRouter as Router, Route, Link} from 'react-router-dom'
 
 import './app.css'
 
 import config from '../config'
-import TaskPage from './pages/TaskPage'
-import FirstPage from './pages/FirstPage'
-import Login from './pages/Login'
+const TaskPage = lazy(() => import('./pages/TaskPage'))
+const FirstPage = lazy(() => import('./pages/FirstPage'))
+const Login = lazy(() => import('./pages/Login'))
 
 class App extends Component {
   render() {
     return <div className="app">
       <Router>
+        <Suspense fallback={<div>Loading...</div>}>
           <p>
             <Link to={`${config.basePath}/`}>Main Page</Link>
             {' | '}
@@ -21,6 +22,7 @@ class App extends Component {
           <Route path={`${config.basePath}/`} exact component={FirstPage}/>
           <Route path={`${config.basePath}/task/:id`} component={TaskPage}/>
           <Route path={`${config.basePath}/login`} component={Login}/>
+        </Suspense>
       </Router>
     </div>
   }

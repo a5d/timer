@@ -1,6 +1,6 @@
 {
   "name": "timer",
-  "homepage": ".",
+  "homepage": "http://jiks.ru/timer/build/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
